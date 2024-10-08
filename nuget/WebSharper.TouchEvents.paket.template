@@ -1,0 +1,20 @@
+type file
+id WebSharper.TouchEvents
+authors
+    IntelliFactory
+owners
+    IntelliFactory
+repositoryType git
+repositoryUrl https://github.com/dotnet-websharper/TouchEvents/
+licenseUrl https://github.com/dotnet-websharper/TouchEvents/blob/master/LICENSE.md
+iconUrl https://github.com/dotnet-websharper/core/raw/websharper50/tools/WebSharper.png
+projectUrl https://github.com/dotnet-websharper/TouchEvents
+description
+    WebSharper bindings for the TouchEvents standard
+tags
+    Web JavaScript F# C#
+files
+    ../WebSharper.TouchEvents/bin/Release/netstandard2.0/WebSharper.TouchEvents.dll ==> lib/netstandard2.0
+    ../WebSharper.TouchEvents/bin/Release/netstandard2.0/WebSharper.TouchEvents.xml ==> lib/netstandard2.0
+dependencies
+        WebSharper ~> LOCKEDVERSION:[3]
