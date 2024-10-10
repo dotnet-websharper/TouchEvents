@@ -32,7 +32,7 @@ module Definition =
         Class "Touch" 
         |=> Nested [TouchInit]
         |+> Static [
-            Constructor TouchInit?options
+            Constructor !?TouchInit?options
         ]
         |+> Instance [
             "identifier" =? T<int>
@@ -75,9 +75,9 @@ module Definition =
         |=> Inherits T<Dom.Event> 
         |=> Nested [TouchEventOptions]
         |+> Static [
-            Constructor (T<string>?``type`` * TouchEventOptions?options)
+            Constructor (T<string>?``type`` * !?TouchEventOptions?options)
         ]
-        |+> Static [
+        |+> Instance [
             "altKey" =? T<bool>
             "changedTouches" =? TouchList
             "ctrlKey" =? T<bool>
