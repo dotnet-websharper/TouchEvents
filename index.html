@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Touch Events API Example</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="Content/WebSharper.TouchEvents.Sample.css" />
+    <style>
+        /* Don't show the not-yet-loaded templates */
+        [ws-template], [ws-children-template] { display: none; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        #touchBox {
+            width: 100px;
+            height: 100px;
+            background-color: lightblue;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            touch-action: none; /* Disable browser default behavior */
+        }
+
+        p {
+            margin-top: 20px;
+        }
+    </style>
+    <script type="module" src="Content/WebSharper.TouchEvents.Sample.head.js"></script>
+</head>
+<body>
+    <h1>Touch Events API Example</h1>
+    <div id="main" ws-children-template="Main">
+        <div ws-onafterrender="TouchInit">
+            <div id="touchBox"></div>
+            <p id="status">Touch the box and move it around!</p>
+        </div>
+        
+    </div>
+    <script type="module" src="Content/WebSharper.TouchEvents.Sample.min.js"></script>
+</body>
+</html>
