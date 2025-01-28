@@ -19,14 +19,18 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Install Paket as a .NET Tool
+        run: dotnet tool restore
+
       - name: Add GitHub registry NuGet source
         shell: cmd
         run: |
-          dotnet nuget add source https://nuget.pkg.github.com/dotnet-websharper/index.json ^
-          --name github ^
+          dotnet paket config add-credentials https://nuget.pkg.github.com/dotnet-websharper/index.json ^
           --username intellifactory-gh ^
           --password "${{ secrets.PAT_PACKAGE }}" ^
-          --store-password-in-clear-text
+
+      - name: Restore Dependencies Using Paket
+        run: dotnet paket restore
 
       - name: Build WebSharper Project
         run: dotnet build WebSharper.TouchEvents.Sample/WebSharper.TouchEvents.Sample.fsproj --configuration Release
@@ -37,7 +41,7 @@ jobs:
           cp -r WebSharper.TouchEvents.Sample/wwwroot/* dist/
 
       - name: Deploy 🚀
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: dist
