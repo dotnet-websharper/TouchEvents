@@ -9,7 +9,7 @@
     <Compile Include="Startup.fs" />
     <None Include="wsconfig.json" />
   </ItemGroup>
-
+  <Import Project="..\.paket\Paket.Restore.targets" />
   <ItemGroup>
     <PackageReference Include="WebSharper" Version="8.0.0.487-beta1" />    
     <PackageReference Include="WebSharper.FSharp" Version="8.0.0.487-beta1" />
@@ -21,5 +21,5 @@
   <ItemGroup>
     <ProjectReference Include="..\WebSharper.TouchEvents\WebSharper.TouchEvents.fsproj" />
   </ItemGroup>
-
+    
 </Project>
