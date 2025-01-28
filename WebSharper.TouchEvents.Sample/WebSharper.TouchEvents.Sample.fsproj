@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,7 +10,7 @@
     <Compile Include="Startup.fs" />
     <None Include="wsconfig.json" />
   </ItemGroup>
-  <Import Project="..\.paket\Paket.Restore.targets" />
+ 
   <ItemGroup>
     <PackageReference Include="WebSharper" Version="8.0.0.487-beta1" />    
     <PackageReference Include="WebSharper.FSharp" Version="8.0.0.487-beta1" />
@@ -21,5 +22,5 @@
   <ItemGroup>
     <ProjectReference Include="..\WebSharper.TouchEvents\WebSharper.TouchEvents.fsproj" />
   </ItemGroup>
-    
+  <Import Project="..\.paket\Paket.Restore.targets" />  
 </Project>
