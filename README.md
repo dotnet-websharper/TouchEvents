@@ -125,8 +125,9 @@ module Client =
     let Main () =
 
         IndexTemplate.Main()
+            // Attach touch event handlers to the elements when the page loads
             .TouchInit(fun () -> 
-                attachTouchEvents()
+                attachTouchEvents() // Call the function to set up touch event listeners
             )
             .Doc()
         |> Doc.RunById "main"
