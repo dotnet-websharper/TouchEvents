@@ -7,6 +7,7 @@ This repository provides an F# [WebSharper](https://websharper.com/) binding for
 The repository consists of two main projects:
 
 1. **Binding Project**:
+
    - Contains the F# WebSharper binding for the Touch Events API.
 
 2. **Sample Project**:
@@ -23,8 +24,6 @@ The repository consists of two main projects:
 ### Prerequisites
 
 - [.NET SDK](https://dotnet.microsoft.com/download) installed on your machine.
-- Node.js and npm (for building web assets).
-- WebSharper tools.
 
 ### Steps
 
@@ -120,13 +119,13 @@ module Client =
         touchBox.AddEventListener("touchend", fun (_: Dom.Event) ->
             status.TextContent <- "Touch ended!"
         )
-    
+
     [<SPAEntryPoint>]
     let Main () =
 
         IndexTemplate.Main()
             // Attach touch event handlers to the elements when the page loads
-            .TouchInit(fun () -> 
+            .TouchInit(fun () ->
                 attachTouchEvents() // Call the function to set up touch event listeners
             )
             .Doc()
