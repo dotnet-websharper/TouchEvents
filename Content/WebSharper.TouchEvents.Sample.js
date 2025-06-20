@@ -2057,19 +2057,15 @@ function CreateRunState(parent, doc){
   return New_1(get_Empty_1(), CreateElemNode(parent, EmptyAttr(), doc));
 }
 function PerformAnimatedUpdate(childrenOnly, st, doc){
-  if(get_UseAnimations()){
-    const _1=null;
-    return Delay(() => {
-      const cur=FindAll(doc);
-      const change=ComputeChangeAnim(st, cur);
-      const enter=ComputeEnterAnim(st, cur);
-      return Bind(Play(Append(change, ComputeExitAnim(st, cur))), () => Bind(SyncElemNodesNextFrame(childrenOnly, st), () => Bind(Play(enter), () => {
-        st.PreviousNodes=cur;
-        return Return(null);
-      })));
-    });
-  }
-  else return SyncElemNodesNextFrame(childrenOnly, st);
+  return get_UseAnimations()?Delay(() => {
+    const cur=FindAll(doc);
+    const change=ComputeChangeAnim(st, cur);
+    const enter=ComputeEnterAnim(st, cur);
+    return Bind(Play(Append(change, ComputeExitAnim(st, cur))), () => Bind(SyncElemNodesNextFrame(childrenOnly, st), () => Bind(Play(enter), () => {
+      st.PreviousNodes=cur;
+      return Return(null);
+    })));
+  }):SyncElemNodesNextFrame(childrenOnly, st);
 }
 function PerformSyncUpdate(childrenOnly, st, doc){
   const cur=FindAll(doc);
@@ -2620,7 +2616,6 @@ function get_UseAnimations(){
   return UseAnimations();
 }
 function Play(anim){
-  const _1=null;
   return Delay(() => Bind(Run(() => { }, Actions(anim)), () => {
     Finalize(anim);
     return Return(null);
@@ -2666,7 +2661,6 @@ function BatchUpdatesEnabled(){
 function StartProcessor(procAsync){
   const st=[0];
   function work(){
-    const _1=null;
     return Delay(() => Bind(procAsync, () => {
       const m=st[0];
       return Equals(m, 1)?(st[0]=0,Zero()):Equals(m, 2)?(st[0]=1,work()):Zero();
@@ -2918,6 +2912,9 @@ class Attr {
       $1:Item2
     });
   }
+  $;
+  $0;
+  $1;
 }
 class AfterRender_1 extends TemplateHole {
   name;
@@ -2956,6 +2953,9 @@ class FSharpList {
       }
     }, void 0);
   }
+  $;
+  $0;
+  $1;
 }
 function concat_2(separator, strings){
   return ofSeq(strings).join(separator);
@@ -3781,6 +3781,9 @@ class CheckedInput {
       $1:inputText
     });
   }
+  $;
+  $0;
+  $1;
 }
 class CancellationTokenSource extends Object_1 {
   init;
