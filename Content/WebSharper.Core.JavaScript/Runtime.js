@@ -17,7 +17,7 @@ export function Lazy(factory) {
     }
     return instance;
   }
-  let res = new Proxy(Function(), {
+  let res = new Proxy(function () { }, {
     get(_, key) {
       if (key == forceSymbol) {
         getInstance();
@@ -251,15 +251,17 @@ export function MarkReadOnly(arr) {
   return arr;
 }
 
-const Runtime = {
+const Runtime = globalThis.WebSharperRuntime || {
   ScriptBasePath: "./",
-  ScriptSkipAssemblyDir: false
+  ScriptSkipAssemblyDir: false,
+  ScriptVersion: ""
 }
 
+globalThis.WebSharperRuntime = Runtime;
 export default Runtime;
 
 export function ScriptPath(a, f) {
-  return Runtime.ScriptBasePath + (Runtime.ScriptSkipAssemblyDir ? "" : a + "/") + f;
+  return Runtime.ScriptBasePath + (Runtime.ScriptSkipAssemblyDir ? "" : a + "/") + f + (Runtime.ScriptVersion || "");
 }
 
 export function GetterOf(o, n) {
@@ -281,21 +283,12 @@ export function LoadScript(u) {
     xhr.open("GET", u, false);
     xhr.send(null);
     scriptsLoaded.push(u.toLowerCase());
-    globalThis.eval(xhr.responseText);
+    if (xhr.status == 200) {
+      globalThis.eval(xhr.responseText);
+    } else {
+      console.error("LoadScript failed:", u, xhr.statusText)
+    }
   }
-}
-
-let load = [];
-
-export function OnLoad(f) {
-  load.push(f);
-}
-
-export function Start() {
-  for (var i = 0; i < load.length; i++) {
-    load[i]();
-  }
-  load = [];
 }
 
 export function ignore() { }
