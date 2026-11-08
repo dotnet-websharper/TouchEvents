@@ -8,18 +8,19 @@ open WebSharper.UI.Client
 open WebSharper.UI.Templating
 open WebSharper.TouchEvents
 
-// The templates are loaded from the DOM, so you just can edit index.html
-// and refresh your browser, no need to recompile unless you add or remove holes.
+// The template is loaded from the DOM, so editing index.html and refreshing
+// the browser is enough; a rebuild is only needed when holes change.
 type IndexTemplate = Template<"wwwroot/index.html", ClientLoad.FromDocument>
 
 [<JavaScript>]
 module Client =
     let offsetX = Var.Create 0.0 // Offset between touch point and box center (X)
-    let offsetY = Var.Create  0.0 // Offset between touch point and box center (Y)
+    let offsetY = Var.Create 0.0 // Offset between touch point and box center (Y)
+    let status = Var.Create "Touch or drag the box to start."
 
     let attachTouchEvents () =
         let touchBox = JS.Document.GetElementById("touchBox") |> As<HTMLElement>
-        let status = JS.Document.GetElementById("status") |> As<HTMLElement>
+        let touchStage = JS.Document.GetElementById("touchStage") |> As<HTMLElement>
 
         // Handle touchstart event
         touchBox.AddEventListener("touchstart", fun (e: Dom.Event) ->
@@ -31,7 +32,7 @@ module Client =
             offsetX := touch.ClientX - rect.Left
             offsetY := touch.ClientY - rect.Top
 
-            status.TextContent <- "Touch started!"
+            status := "Touch started!"
         )
 
         // Handle touchmove event
@@ -40,25 +41,23 @@ module Client =
             e.PreventDefault() // Prevent scrolling or default touch behavior
 
             let touch = touchEvent.Touches.[0] // Get the first touch point
+            let stageRect = touchStage.GetBoundingClientRect()
 
-            // Update the position of the box dynamically
-            touchBox.Style.SetProperty("left", sprintf "%fpx" (touch.ClientX - offsetX.Value))
-            touchBox.Style.SetProperty("top", sprintf "%fpx" (touch.ClientY - offsetY.Value))
+            // Update the position of the box dynamically, relative to the stage
+            touchBox.Style.SetProperty("left", sprintf "%.1fpx" (touch.ClientX - stageRect.Left - offsetX.Value))
+            touchBox.Style.SetProperty("top", sprintf "%.1fpx" (touch.ClientY - stageRect.Top - offsetY.Value))
 
-            status.TextContent <- sprintf "Moving to: (%f, %f)" touch.ClientX touch.ClientY
+            status := sprintf "Moving to: (%.1f, %.1f)" touch.ClientX touch.ClientY
         )
 
         // Handle touchend event
         touchBox.AddEventListener("touchend", fun (_: Dom.Event) ->
-            status.TextContent <- "Touch ended!"
+            status := "Touch ended!"
         )
-    
+
     [<SPAEntryPoint>]
     let Main () =
-
-        IndexTemplate.Main()
-            .TouchInit(fun () -> 
-                attachTouchEvents()
-            )
-            .Doc()
-        |> Doc.RunById "main"
+        IndexTemplate()
+            .TouchInit(fun () -> attachTouchEvents ())
+            .status(status.V)
+            .Bind()

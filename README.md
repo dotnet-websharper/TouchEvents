@@ -1,135 +1,149 @@
-# WebSharper Touch Events API Binding
+# WebSharper.TouchEvents
 
-This repository provides an F# [WebSharper](https://websharper.com/) binding for the [Touch Events API](https://developer.mozilla.org/en-US/docs/Web/API/Touch_events), enabling seamless handling of touch interactions in WebSharper applications.
+[![NuGet](https://img.shields.io/badge/nuget-not%20published-lightgrey)](https://github.com/dotnet-websharper/TouchEvents)
 
-## Repository Structure
+WebSharper bindings for the [Touch Events API](https://developer.mozilla.org/en-US/docs/Web/API/Touch_events) —
+handling `touchstart`, `touchmove`, and `touchend` in F# and C# web apps.
 
-The repository consists of two main projects:
+Touch events are the browser's low-level pointer interface for touch screens. The binding exposes the
+`Touch`, `TouchList`, and `TouchEvent` types together with their configuration objects.
 
-1. **Binding Project**:
+This repository contains:
 
-   - Contains the F# WebSharper binding for the Touch Events API.
+| Project | Purpose |
+| --- | --- |
+| `WebSharper.TouchEvents` | The binding: WIG definitions for `Touch`, `TouchList`, `TouchEvent`, `TouchInit`, and `TouchEventOptions`. |
+| `WebSharper.TouchEvents.Sample` | An ASP.NET Core SPA with a draggable box driven by the touch events. |
 
-2. **Sample Project**:
-   - Demonstrates how to use the Touch Events API with WebSharper syntax.
+## Live demos
+
+**Try it live:** [Open the sample in your browser](https://dotnet-websharper.github.io/TouchEvents/)
+
+![Touch Events sample](docs/sample.png)
+
+The sample doubles as the binding's [test case](#running-the-sample): it attaches `touchstart`, `touchmove`, and `touchend` handlers to a movable box and reports the touch state in the page.
+
+- **Sample (this repository):** <https://dotnet-websharper.github.io/TouchEvents/>
+- **Source repository:** <https://github.com/dotnet-websharper/TouchEvents>
+- **WebSharper bindings:** <https://websharper.com/bindings>
 
 ## Features
 
-- WebSharper bindings for the Touch Events API.
-- Easy integration of touch-based interactions in F# web applications.
-- Example usage for implementing multi-touch gestures, drag-and-drop, and more.
+- `TouchEvent` extends `Dom.Event`, with `touches`, `targetTouches`, `changedTouches`, and the modifier keys.
+- `TouchList` with `length` and `item(index)`.
+- `Touch` with `identifier`, `screenX`, `screenY`, `clientX`, `clientY`, `pageX`, `pageY`, `target`, `radiusX`, `radiusY`, `rotationAngle`, and `force`.
+- `TouchInit` and `TouchEventOptions` configuration types, plus the `TouchEvent` constructor.
 
-## Installation and Building
+## Installation
+
+The binding is not currently published to NuGet. Reference the project from source:
+
+```bash
+git clone https://github.com/dotnet-websharper/TouchEvents.git
+```
+
+```xml
+<ItemGroup>
+  <ProjectReference Include="path/to/WebSharper.TouchEvents/WebSharper.TouchEvents.fsproj" />
+</ItemGroup>
+```
+
+## Usage
+
+```fsharp
+namespace WebSharper.TouchEvents.Demo
+
+open WebSharper
+open WebSharper.JavaScript
+open WebSharper.TouchEvents
+
+[<JavaScript>]
+module Demo =
+    let attachTouchEvents (box: Dom.Element) =
+        box.AddEventListener("touchstart", fun (e: Dom.Event) ->
+            let touch = (As<TouchEvent>(e)).Touches.[0]
+            Console.Log $"touch started at {touch.ClientX}, {touch.ClientY}"
+        )
+
+        box.AddEventListener("touchmove", fun (e: Dom.Event) ->
+            e.PreventDefault()
+            let touch = (As<TouchEvent>(e)).Touches.[0]
+            Console.Log $"moving to {touch.ClientX}, {touch.ClientY}"
+        )
+
+        box.AddEventListener("touchend", fun (_: Dom.Event) ->
+            Console.Log "touch ended"
+        )
+```
+
+Set `touch-action: none` on the element in CSS so the browser does not scroll while the finger moves.
+`TouchList` exposes `item(index)`; `.[0]` also resolves to the first touch.
+
+## Running the sample
+
+Build the sample in Release and serve its static output:
+
+```bash
+dotnet build WebSharper.TouchEvents.Sample/WebSharper.TouchEvents.Sample.fsproj -c Release
+python3 -m http.server -d WebSharper.TouchEvents.Sample/wwwroot 8101
+```
+
+Open <http://localhost:8101/>. The page renders the draggable box and the live touch status. Drag the box with a
+finger or a device-emulation touch pointer.
+
+Alternatively, run the ASP.NET Core host:
+
+```bash
+dotnet run --project WebSharper.TouchEvents.Sample
+```
+
+## Building from source
 
 ### Prerequisites
 
-- [.NET SDK](https://dotnet.microsoft.com/download) installed on your machine.
+- [.NET SDK 10](https://dotnet.microsoft.com/download) or later.
 
-### Steps
+### Build
 
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/dotnet-websharper/TouchEvents.git
-   cd TouchEvents
-   ```
-
-2. Build the Binding Project:
-
-   ```bash
-   dotnet build WebSharper.TouchEvents/WebSharper.TouchEvents.fsproj
-   ```
-
-3. Build and Run the Sample Project:
-
-   ```bash
-   cd WebSharper.TouchEvents.Sample
-   dotnet build
-   dotnet run
-   ```
-
-4. Open the sample project in your browser to see it in action.
-
-## Why Use the Touch Events API
-
-The Touch Events API enables developers to:
-
-1. **Enhance User Interactions**: Support touch-based devices for improved user experience.
-2. **Implement Complex Gestures**: Build multi-touch interactions such as pinch, zoom, and swipe.
-3. **Create Mobile-Friendly Apps**: Optimize applications for touch-first devices like smartphones and tablets.
-
-Integrating the Touch Events API with WebSharper allows F# developers to create interactive and mobile-friendly applications seamlessly.
-
-## How to Use the Touch Events API
-
-### Example Usage
-
-Below is an example of how to use the Touch Events API in a WebSharper project for handling touch interactions:
-
-```fsharp
-open WebSharper
-open WebSharper.JavaScript
-open WebSharper.UI
-open WebSharper.UI.Notation
-open WebSharper.UI.Client
-open WebSharper.UI.Templating
-open WebSharper.TouchEvents
-
-// The templates are loaded from the DOM, so you just can edit index.html
-// and refresh your browser, no need to recompile unless you add or remove holes.
-type IndexTemplate = Template<"wwwroot/index.html", ClientLoad.FromDocument>
-
-[<JavaScript>]
-module Client =
-    let offsetX = Var.Create 0.0 // Offset between touch point and box center (X)
-    let offsetY = Var.Create  0.0 // Offset between touch point and box center (Y)
-
-    let attachTouchEvents () =
-        let touchBox = JS.Document.GetElementById("touchBox") |> As<HTMLElement>
-        let status = JS.Document.GetElementById("status") |> As<HTMLElement>
-
-        // Handle touchstart event
-        touchBox.AddEventListener("touchstart", fun (e: Dom.Event) ->
-            let touchEvent = As<TouchEvent>(e)
-            let touch = touchEvent.Touches.[0] // Get the first touch point
-            let rect = touchBox.GetBoundingClientRect()
-
-            // Calculate the offset between the touch point and the box's position
-            offsetX := touch.ClientX - rect.Left
-            offsetY := touch.ClientY - rect.Top
-
-            status.TextContent <- "Touch started!"
-        )
-
-        // Handle touchmove event
-        touchBox.AddEventListener("touchmove", fun (e: Dom.Event) ->
-            let touchEvent = As<TouchEvent>(e)
-            e.PreventDefault() // Prevent scrolling or default touch behavior
-
-            let touch = touchEvent.Touches.[0] // Get the first touch point
-
-            // Update the position of the box dynamically
-            touchBox.Style.SetProperty("left", sprintf "%fpx" (touch.ClientX - offsetX.Value))
-            touchBox.Style.SetProperty("top", sprintf "%fpx" (touch.ClientY - offsetY.Value))
-
-            status.TextContent <- sprintf "Moving to: (%f, %f)" touch.ClientX touch.ClientY
-        )
-
-        // Handle touchend event
-        touchBox.AddEventListener("touchend", fun (_: Dom.Event) ->
-            status.TextContent <- "Touch ended!"
-        )
-
-    [<SPAEntryPoint>]
-    let Main () =
-
-        IndexTemplate.Main()
-            // Attach touch event handlers to the elements when the page loads
-            .TouchInit(fun () ->
-                attachTouchEvents() // Call the function to set up touch event listeners
-            )
-            .Doc()
-        |> Doc.RunById "main"
+```bash
+dotnet build WebSharper.TouchEvents.sln -c Release
 ```
 
-This example demonstrates how to handle basic touch interactions such as `touchstart`, `touchmove`, and `touchend`.
+The binding targets `netstandard2.0`; the sample targets `net10.0`.
+
+## Deployment
+
+Pushing to `main` triggers `.github/workflows/ghpages.yml`, which builds the sample in Release and publishes
+`WebSharper.TouchEvents.Sample/wwwroot` to the `gh-pages` branch.
+
+## Repository layout
+
+```
+WebSharper.TouchEvents/              # binding (WIG definitions)
+  Main.fs
+WebSharper.TouchEvents.Sample/       # ASP.NET Core SPA demo
+  Client.fs
+  Startup.fs
+  wwwroot/
+    index.html
+    site.css
+    Content/                         # generated at build time (gitignored)
+docs/sample.png
+.github/workflows/ghpages.yml        # build + deploy the sample to GitHub Pages
+```
+
+## Notes on the API
+
+- **Touch devices:** touch events are not fired by a mouse. Use a touch screen or the browser's device
+  emulation (for example, Chrome DevTools' device toolbar).
+- **`touch-action`:** set `touch-action: none` on the draggable element to prevent the browser's default
+  scrolling and zooming gestures from interrupting the drag.
+- **Touch lists:** `touches`, `targetTouches`, and `changedTouches` are `TouchList` values. Read the first
+  touch with `item(0)` or `.[0]`.
+- **Prevent default:** call `e.PreventDefault()` in `touchmove` when the page should not scroll during the drag.
+- **Mouse and pointer fallback:** for a single input path that works with both mouse and touch, use pointer
+  events (`PointerEvent`) instead of the touch-specific API.
+
+## License
+
+Apache 2.0 — see [LICENSE.md](LICENSE.md).
